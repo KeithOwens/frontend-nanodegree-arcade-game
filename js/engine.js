@@ -48,8 +48,9 @@ var Engine = (function(global)
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        update(dt);
-        render();
+		 
+		update(dt);
+		render();
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -69,7 +70,7 @@ var Engine = (function(global)
     function init() 
 	{
         reset();
-        lastTime = Date.now();
+		lastTime = Date.now();
         main();
     }
 
@@ -143,10 +144,30 @@ var Engine = (function(global)
      * game tick (or loop of the game engine) because that's how games work -
      * they are flipbooks creating the illusion of animation but in reality
      * they are just drawing the entire screen over and over.
+	 * Notice that the state of selection is used to control what exactly is 
+	 * painted on teh screen.
      */
     function render() 
 	{
-        /* This array holds the relative URL to the image used
+		renderBackground();
+		if (selection.selectionMade == 'true')
+		{
+			player.sprite = selection.sprite;
+			renderEntities();
+		}
+		else
+		{
+			renderPlayerOptions();
+			selection.render();
+		}
+    }
+	
+	/* This function is called by the render function and is called on each game
+     * tick. Its purpose is to render the background
+     */
+    function renderBackground() 
+	{
+         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
         var rowImages = 
@@ -180,8 +201,6 @@ var Engine = (function(global)
                 ctx.drawImage(Resources.get(rowImages[row]), col * columnWidth, row * rowWidth);
             }
         }
-		
-        renderEntities();
     }
 
     /* This function is called by the render function and is called on each game
@@ -200,6 +219,19 @@ var Engine = (function(global)
 
         player.render();
 		checkWinning();
+    }
+	
+	/* This function is called by the render function and is called on each game
+     * tick. Its purpose is to render the different players available for the game
+     */
+    function renderPlayerOptions() 
+	{
+		ctx.drawImage(Resources.get('images/choose-player.png'), columnWidth-5, 2*columnWidth);
+		ctx.drawImage(Resources.get('images/char-boy.png'), 0, 3*columnWidth);
+		ctx.drawImage(Resources.get('images/char-cat-girl.png'), columnWidth, 3*columnWidth);
+		ctx.drawImage(Resources.get('images/char-horn-girl.png'), 2*columnWidth, 3*columnWidth);
+		ctx.drawImage(Resources.get('images/char-pink-girl.png'), 3*columnWidth, 3*columnWidth);
+		ctx.drawImage(Resources.get('images/char-princess-girl.png'), 4*columnWidth, 3*columnWidth);
     }
 
     /* This function does nothing but it could have been a good place to
@@ -223,9 +255,14 @@ var Engine = (function(global)
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
+		'images/char-cat-girl.png',
+		'images/char-horn-girl.png',
+		'images/char-pink-girl.png',
+		'images/char-princess-girl.png',
+		'images/choose-player.png',
 		'images/you-win.png',
-		'images/crash.png',
-		'images/enemy-bug-flipped.png'
+		'images/enemy-bug-flipped.png',
+		'images/selector.png'
     ]);
     Resources.onReady(init);
 
